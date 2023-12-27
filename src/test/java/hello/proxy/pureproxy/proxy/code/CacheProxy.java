@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CacheProxy implements Subject {
     private Subject target;
 //    private String cacheValue;
-   private ThreadLocal<String> cacheValue = new ThreadLocal<>();
+   private String cacheValue;
     public CacheProxy(Subject target) {
         this.target = target;
     }
@@ -14,9 +14,9 @@ public class CacheProxy implements Subject {
     @Override
     public String operation() {
         log.info("프록시 호출");
-        if(cacheValue.get() == null){
-            cacheValue.set(target.operation());
+        if(cacheValue == null){
+            cacheValue =target.operation();
         }
-        return cacheValue.get();
+        return cacheValue;
     }
 }
