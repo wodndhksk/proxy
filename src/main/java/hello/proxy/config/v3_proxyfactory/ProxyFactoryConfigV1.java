@@ -5,6 +5,7 @@ import hello.proxy.config.v3_proxyfactory.advice.LogTraceAdvice;
 import hello.proxy.trace.logtrace.LogTrace;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.aop.Advice;
+import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
@@ -19,7 +20,7 @@ public class ProxyFactoryConfigV1 {
     public OrderControllerV1 orderControllerV1(LogTrace logTrace) {
         OrderControllerV1Impl orderController = new OrderControllerV1Impl(orderServiceV1(logTrace));
         ProxyFactory factory = new ProxyFactory(orderController);
-        factory.addAdvice(getAdvisor(logTrace));
+        factory.addAdvisor(getAdvisor(logTrace));
 
         OrderControllerV1 proxy = (OrderControllerV1) factory.getProxy();
         proxyFactoryLog(proxy.getClass(), orderController.getClass());
@@ -30,7 +31,7 @@ public class ProxyFactoryConfigV1 {
     public OrderServiceV1 orderServiceV1(LogTrace logTrace) {
         OrderServiceV1Impl orderService = new OrderServiceV1Impl(orderRepositoryV1(logTrace));
         ProxyFactory factory = new ProxyFactory(orderService);
-        factory.addAdvice(getAdvisor(logTrace));
+        factory.addAdvisor(getAdvisor(logTrace));
 
         OrderServiceV1 proxy = (OrderServiceV1) factory.getProxy();
         proxyFactoryLog(proxy.getClass(), orderService.getClass());
@@ -41,7 +42,7 @@ public class ProxyFactoryConfigV1 {
     public OrderRepositoryV1 orderRepositoryV1(LogTrace logTrace){
         OrderRepositoryV1Impl orderRepository = new OrderRepositoryV1Impl();
         ProxyFactory factory = new ProxyFactory(orderRepository);
-        factory.addAdvice(getAdvisor(logTrace));
+        factory.addAdvisor(getAdvisor(logTrace));
 
         OrderRepositoryV1 proxy = (OrderRepositoryV1) factory.getProxy();
         proxyFactoryLog(proxy.getClass(), orderRepository.getClass());
@@ -53,7 +54,7 @@ public class ProxyFactoryConfigV1 {
      * @param logTrace
      * @return
      */
-    private Advice getAdvisor(LogTrace logTrace) {
+    private Advisor getAdvisor(LogTrace logTrace) {
         // pointcut
         NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
         pointcut.setMappedNames("request*", "order*", "save*");
@@ -61,7 +62,7 @@ public class ProxyFactoryConfigV1 {
         //advise
         LogTraceAdvice advice = new LogTraceAdvice(logTrace);
         DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(pointcut, advice);
-        return advice;
+        return advisor;
     }
 
     /**
